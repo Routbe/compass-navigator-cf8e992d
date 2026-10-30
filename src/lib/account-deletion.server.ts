@@ -75,7 +75,7 @@ export async function purgeDueDeletions(limit = 25) {
     const users = (await sql`select user_metadata->>'neon_auth_id' as auth_id from public.users where id = ${userId}`) as Row[];
     const authId = (users[0]?.["auth_id"] as string | null) ?? userId;
     await sql.transaction([
-      sql`delete from public.admin_bootstrap_tokens where created_by = ${userId}`,
+      sql`delete from public.admin_bootstrap_tokens where consumed_by = ${userId}`,
       sql`delete from public.users where id = ${userId}`,
       sql`delete from neon_auth."user" where id::text = ${authId}`,
       sql`update public.account_deletions set completed_at = now() where user_id = ${userId}`,

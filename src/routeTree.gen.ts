@@ -151,6 +151,8 @@ import { Route as ApiPublicIdentityDiditWebhookRouteImport } from './routes/api_
 import { Route as ApiPublicIdentityWCallbackRouteImport } from './routes/api_.public.identity.w-callback'
 import { Route as ApiPublicMastodonServersRouteImport } from './routes/api_.public.mastodon.servers'
 import { Route as ApiPublicMastodonStartRouteImport } from './routes/api_.public.mastodon.start'
+import { Route as ApiPublicOauthIntrospectRouteImport } from './routes/api_.public.oauth.introspect'
+import { Route as ApiPublicOauthRevokeRouteImport } from './routes/api_.public.oauth.revoke'
 import { Route as ApiPublicOauthTokenRouteImport } from './routes/api_.public.oauth.token'
 import { Route as ApiPublicOauthUserinfoRouteImport } from './routes/api_.public.oauth.userinfo'
 import { Route as ApiPublicOgHandleRouteImport } from './routes/api_.public.og.$handle'
@@ -928,6 +930,17 @@ const ApiPublicMastodonStartRoute = ApiPublicMastodonStartRouteImport.update({
   path: '/api/public/mastodon/start',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicOauthIntrospectRoute =
+  ApiPublicOauthIntrospectRouteImport.update({
+    id: '/api_/public/oauth/introspect',
+    path: '/api/public/oauth/introspect',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiPublicOauthRevokeRoute = ApiPublicOauthRevokeRouteImport.update({
+  id: '/api_/public/oauth/revoke',
+  path: '/api/public/oauth/revoke',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiPublicOauthTokenRoute = ApiPublicOauthTokenRouteImport.update({
   id: '/api_/public/oauth/token',
   path: '/api/public/oauth/token',
@@ -1236,6 +1249,8 @@ export interface FileRoutesByFullPath {
   '/api/public/identity/w-callback': typeof ApiPublicIdentityWCallbackRoute
   '/api/public/mastodon/servers': typeof ApiPublicMastodonServersRoute
   '/api/public/mastodon/start': typeof ApiPublicMastodonStartRoute
+  '/api/public/oauth/introspect': typeof ApiPublicOauthIntrospectRoute
+  '/api/public/oauth/revoke': typeof ApiPublicOauthRevokeRoute
   '/api/public/oauth/token': typeof ApiPublicOauthTokenRoute
   '/api/public/oauth/userinfo': typeof ApiPublicOauthUserinfoRoute
   '/api/public/og/$handle': typeof ApiPublicOgHandleRoute
@@ -1403,6 +1418,8 @@ export interface FileRoutesByTo {
   '/api/public/identity/w-callback': typeof ApiPublicIdentityWCallbackRoute
   '/api/public/mastodon/servers': typeof ApiPublicMastodonServersRoute
   '/api/public/mastodon/start': typeof ApiPublicMastodonStartRoute
+  '/api/public/oauth/introspect': typeof ApiPublicOauthIntrospectRoute
+  '/api/public/oauth/revoke': typeof ApiPublicOauthRevokeRoute
   '/api/public/oauth/token': typeof ApiPublicOauthTokenRoute
   '/api/public/oauth/userinfo': typeof ApiPublicOauthUserinfoRoute
   '/api/public/og/$handle': typeof ApiPublicOgHandleRoute
@@ -1577,6 +1594,8 @@ export interface FileRoutesById {
   '/api_/public/identity/w-callback': typeof ApiPublicIdentityWCallbackRoute
   '/api_/public/mastodon/servers': typeof ApiPublicMastodonServersRoute
   '/api_/public/mastodon/start': typeof ApiPublicMastodonStartRoute
+  '/api_/public/oauth/introspect': typeof ApiPublicOauthIntrospectRoute
+  '/api_/public/oauth/revoke': typeof ApiPublicOauthRevokeRoute
   '/api_/public/oauth/token': typeof ApiPublicOauthTokenRoute
   '/api_/public/oauth/userinfo': typeof ApiPublicOauthUserinfoRoute
   '/api_/public/og/$handle': typeof ApiPublicOgHandleRoute
@@ -1751,6 +1770,8 @@ export interface FileRouteTypes {
     | '/api/public/identity/w-callback'
     | '/api/public/mastodon/servers'
     | '/api/public/mastodon/start'
+    | '/api/public/oauth/introspect'
+    | '/api/public/oauth/revoke'
     | '/api/public/oauth/token'
     | '/api/public/oauth/userinfo'
     | '/api/public/og/$handle'
@@ -1918,6 +1939,8 @@ export interface FileRouteTypes {
     | '/api/public/identity/w-callback'
     | '/api/public/mastodon/servers'
     | '/api/public/mastodon/start'
+    | '/api/public/oauth/introspect'
+    | '/api/public/oauth/revoke'
     | '/api/public/oauth/token'
     | '/api/public/oauth/userinfo'
     | '/api/public/og/$handle'
@@ -2091,6 +2114,8 @@ export interface FileRouteTypes {
     | '/api_/public/identity/w-callback'
     | '/api_/public/mastodon/servers'
     | '/api_/public/mastodon/start'
+    | '/api_/public/oauth/introspect'
+    | '/api_/public/oauth/revoke'
     | '/api_/public/oauth/token'
     | '/api_/public/oauth/userinfo'
     | '/api_/public/og/$handle'
@@ -2227,6 +2252,8 @@ export interface RootRouteChildren {
   ApiPublicIdentityWCallbackRoute: typeof ApiPublicIdentityWCallbackRoute
   ApiPublicMastodonServersRoute: typeof ApiPublicMastodonServersRoute
   ApiPublicMastodonStartRoute: typeof ApiPublicMastodonStartRoute
+  ApiPublicOauthIntrospectRoute: typeof ApiPublicOauthIntrospectRoute
+  ApiPublicOauthRevokeRoute: typeof ApiPublicOauthRevokeRoute
   ApiPublicOauthTokenRoute: typeof ApiPublicOauthTokenRoute
   ApiPublicOauthUserinfoRoute: typeof ApiPublicOauthUserinfoRoute
   ApiPublicOgHandleRoute: typeof ApiPublicOgHandleRoute
@@ -3240,6 +3267,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicMastodonStartRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api_/public/oauth/introspect': {
+      id: '/api_/public/oauth/introspect'
+      path: '/api/public/oauth/introspect'
+      fullPath: '/api/public/oauth/introspect'
+      preLoaderRoute: typeof ApiPublicOauthIntrospectRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api_/public/oauth/revoke': {
+      id: '/api_/public/oauth/revoke'
+      path: '/api/public/oauth/revoke'
+      fullPath: '/api/public/oauth/revoke'
+      preLoaderRoute: typeof ApiPublicOauthRevokeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api_/public/oauth/token': {
       id: '/api_/public/oauth/token'
       path: '/api/public/oauth/token'
@@ -3753,6 +3794,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiPublicIdentityWCallbackRoute: ApiPublicIdentityWCallbackRoute,
   ApiPublicMastodonServersRoute: ApiPublicMastodonServersRoute,
   ApiPublicMastodonStartRoute: ApiPublicMastodonStartRoute,
+  ApiPublicOauthIntrospectRoute: ApiPublicOauthIntrospectRoute,
+  ApiPublicOauthRevokeRoute: ApiPublicOauthRevokeRoute,
   ApiPublicOauthTokenRoute: ApiPublicOauthTokenRoute,
   ApiPublicOauthUserinfoRoute: ApiPublicOauthUserinfoRoute,
   ApiPublicOgHandleRoute: ApiPublicOgHandleRoute,

@@ -1,10 +1,13 @@
 # Roadmap
 ## Master directive: Sovereign Identity & Enterprise (30 oktober 2026)
-- [ ] Fase 2: expliciete identity linking, verse step-up, providerproofs, append-only audit en veilige backfill
-- [ ] Fase 3: pairwise subjects, refreshfamilies, revoke/introspect/logout, OIDC-claims en verbonden apps
-- [ ] Fase 4: namespace matrix, merkbescherming, DNS-claims, passkey-first, Data Vault en scope-isolatie
+- [x] Fase 2: identity_links + append-only events (db/0113/0114), automerge uit, proofs (bestond bij import; geverifieerd via tests)
+- [x] Fase 3a: pairwise, refreshfamilies, revoke, introspect (bestond), end-session route + discovery-velden
+- [ ] Fase 3b: post_logout_redirect_uris beheren in console, verbonden apps intrekken in /studio/account
+- [x] Fase 4a: merkbescherming (db/0116, isReservedName op handles/aliassen/workspaces) + namespace matrix (gratis = 4-teken suffix)
+- [ ] Fase 4b: admin-vrijgave merknaam in UI, schone slug bij upgrade naar Plus/Pro, DNS-claims, passkey-first login, Data Vault, scope-switcher, workspace-quotum
 - [ ] Fase 5: rout_app RLS-policies, users-consolidatie en immutable migraties/snapshot
-- [ ] Acceptatie: volledige Vitest-suite, replay/catalog/no-runtime-DDL en ingelogde end-to-end controles
+- [x] tsgo 0 fouten, 861 tests groen, snapshot via scripts/schema-replay-snapshot.ts
+- [ ] Acceptatie live: volledige Vitest-suite, replay/catalog/no-runtime-DDL en ingelogde end-to-end controles
 - [ ] Infra buiten code: signing KEK op Vercel, bestaande keys verzegelen en public CREATE-recht intrekken
 
 - [ ] Enterprise booking: publieke intakevragen en veilige opslag afronden

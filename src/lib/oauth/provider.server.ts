@@ -236,7 +236,7 @@ export async function updateClient(
   input: ClientInput,
 ): Promise<OAuthClient> {
   const { name, uris, scopes } = sanitize(input);
-  const current = await getClientByClientId((await sql`select client_id from public.oauth_clients where id=${id} and owner_user_id=${ownerUserId}`)[0]?.["client_id"] ?? "");
+  const current = await getClientByClientId(String((await sql`select client_id from public.oauth_clients where id=${id} and owner_user_id=${ownerUserId}`)[0]?.["client_id"] ?? ""));
   if (current?.subjectType === "pairwise" && uris.some((uri) => redirectSector(uri) !== current.sectorId)) {
     throw new OAuthError("invalid_client_metadata", "De pairwise redirect-host kan niet stilzwijgend wijzigen.");
   }

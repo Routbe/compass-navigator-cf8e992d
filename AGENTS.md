@@ -51,3 +51,6 @@
 - Profile sub-pages (`/$username/booking|tip|donate|$slug`, `/u/$username/...`) are un-nested route files (`$username_.*.tsx`) because the profile routes render no `<Outlet />`. Why: nested children silently rendered the profile instead of the sub-page.
 - Uploads check the active-scope quota before any storage configuration check and surface `STORAGE_QUOTA_MESSAGE`. Why: a 0 MB workspace must always get the quota answer, never a different error.
 - Public workspace pages live at /w/$slug via workspace-public.functions.ts and expose only name, avatar, verified domain and a public profile handle; slug validity comes only from isValidWorkspaceSlug in workspace-rules.ts. Why: one rule for server, UI and DB check.
+
+- Brand protection comes only from `src/lib/reserved-brands.ts` (`isReservedName`, mirrored in db/0116 `reserved_brands`) and is applied inside `isReservedHandle` and `isValidWorkspaceSlug`; free workspaces get `matrixWorkspaceSlug(..., "free")` with a random 4-char suffix. Why: one rule for handles, aliases and slugs.
+- Without a live database, refresh db/schema.snapshot.json + db-types via `bun scripts/schema-replay-snapshot.ts` (PGlite replay); confirm live with `schema-snapshot.ts --check`. Why: the snapshot must track every migration even offline.

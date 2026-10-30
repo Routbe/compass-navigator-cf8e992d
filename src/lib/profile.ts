@@ -1,3 +1,4 @@
+import { isReservedName } from "./reserved-brands";
 /**
  * ROUT Profile & Link Hub — data model for the public rout.be/@handle page.
  * Kept deliberately small: handle + identity + an ordered list of blocks.
@@ -326,7 +327,7 @@ export const RESERVED_HANDLES = [
   "dev",
 ];
 
-export const isReservedHandle = (h: string) => RESERVED_HANDLES.includes(h);
+export const isReservedHandle = (h: string) => RESERVED_HANDLES.includes(h) || isReservedName(h).reserved;
 
 /**
  * Public path for a profile: eigen namespace bij verificatie, anders `/u/`.

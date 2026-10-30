@@ -669,6 +669,37 @@ export interface PublicIdentityLabelsRow {
   "updated_at": string | Date;
 }
 
+export interface PublicIdentityLinkEventsRow {
+  "id": string;
+  "link_id": string;
+  "user_id": string;
+  "event": string;
+  "actor": string;
+  "ip_hash": Uint8Array | null;
+  "ua_hash": Uint8Array | null;
+  "prev_hash": Uint8Array | null;
+  "event_hash": Uint8Array;
+  "created_at": string | Date;
+}
+
+export interface PublicIdentityLinksRow {
+  "id": string;
+  "user_id": string;
+  "provider": string;
+  "issuer": string;
+  "provider_sub": string;
+  "display_handle": string | null;
+  "proof_method": string;
+  "proof_digest": Uint8Array;
+  "step_up_method": string;
+  "step_up_at": string | Date;
+  "status": string;
+  "login_enabled": boolean;
+  "created_at": string | Date;
+  "last_verified_at": string | Date;
+  "revoked_at": string | Date | null;
+}
+
 export interface PublicIdentityVerificationSessionsRow {
   "state": string;
   "user_id": string;
@@ -778,6 +809,18 @@ export interface PublicNotificationsRow {
   "created_at": string | Date;
 }
 
+export interface PublicOauthAccessTokensRow {
+  "token_hash": string;
+  "client_id": string;
+  "user_id": string;
+  "subject": string;
+  "scopes": Array<string>;
+  "family_id": string | null;
+  "expires_at": string | Date;
+  "revoked_at": string | Date | null;
+  "created_at": string | Date;
+}
+
 export interface PublicOauthAuthCodesRow {
   "code_hash": string;
   "client_id": string;
@@ -791,6 +834,7 @@ export interface PublicOauthAuthCodesRow {
   "created_at": string | Date;
   "acr": string | null;
   "rich_identity": boolean;
+  "auth_time": string | Date | null;
 }
 
 export interface PublicOauthClientTestUsersRow {
@@ -840,6 +884,9 @@ export interface PublicOauthClientsRow {
   "description": string | null;
   "handle_sync_enabled": boolean;
   "workspace_id": string | null;
+  "subject_type": string;
+  "sector_id": string | null;
+  "post_logout_redirect_uris": Array<string>;
 }
 
 export interface PublicOauthConsentsRow {
@@ -847,6 +894,7 @@ export interface PublicOauthConsentsRow {
   "client_id": string;
   "scopes": Array<string>;
   "granted_at": string | Date;
+  "revoked_at": string | Date | null;
 }
 
 export interface PublicOauthDebugEventsRow {
@@ -856,6 +904,22 @@ export interface PublicOauthDebugEventsRow {
   "outcome": string;
   "error_code": string | null;
   "detail": JsonValue;
+  "created_at": string | Date;
+}
+
+export interface PublicOauthRefreshTokensRow {
+  "id": string;
+  "family_id": string;
+  "token_hash": string;
+  "client_id": string;
+  "user_id": string;
+  "scopes": Array<string>;
+  "expires_at": string | Date;
+  "used_at": string | Date | null;
+  "revoked_at": string | Date | null;
+  "subject": string;
+  "auth_time": string | Date | null;
+  "acr": string | null;
   "created_at": string | Date;
 }
 
@@ -1150,6 +1214,21 @@ export interface PublicReferralsRow {
   "verified": boolean;
   "created_at": string | Date;
   "verified_at": string | Date | null;
+}
+
+export interface PublicReservedBrandReleasesRow {
+  "term": string;
+  "user_id": string;
+  "released_by": string;
+  "evidence": string;
+  "created_at": string | Date;
+}
+
+export interface PublicReservedBrandsRow {
+  "term": string;
+  "category": string;
+  "reason": string;
+  "created_at": string | Date;
 }
 
 export interface PublicReservedHandlesRow {
@@ -1742,6 +1821,8 @@ export interface DbTables {
   "public.gift_cards": PublicGiftCardsRow;
   "public.guestbook_entries": PublicGuestbookEntriesRow;
   "public.identity_labels": PublicIdentityLabelsRow;
+  "public.identity_link_events": PublicIdentityLinkEventsRow;
+  "public.identity_links": PublicIdentityLinksRow;
   "public.identity_verification_sessions": PublicIdentityVerificationSessionsRow;
   "public.identity_verifications": PublicIdentityVerificationsRow;
   "public.influencer_requests": PublicInfluencerRequestsRow;
@@ -1752,12 +1833,14 @@ export interface DbTables {
   "public.newsletter_subscribers": PublicNewsletterSubscribersRow;
   "public.nfc_waitlist": PublicNfcWaitlistRow;
   "public.notifications": PublicNotificationsRow;
+  "public.oauth_access_tokens": PublicOauthAccessTokensRow;
   "public.oauth_auth_codes": PublicOauthAuthCodesRow;
   "public.oauth_client_test_users": PublicOauthClientTestUsersRow;
   "public.oauth_client_verification_requests": PublicOauthClientVerificationRequestsRow;
   "public.oauth_clients": PublicOauthClientsRow;
   "public.oauth_consents": PublicOauthConsentsRow;
   "public.oauth_debug_events": PublicOauthDebugEventsRow;
+  "public.oauth_refresh_tokens": PublicOauthRefreshTokensRow;
   "public.oauth_signing_keys": PublicOauthSigningKeysRow;
   "public.oauth_step_up_codes": PublicOauthStepUpCodesRow;
   "public.onboarding_drafts": PublicOnboardingDraftsRow;
@@ -1780,6 +1863,8 @@ export interface DbTables {
   "public.qr_scans": PublicQrScansRow;
   "public.rate_limits": PublicRateLimitsRow;
   "public.referrals": PublicReferralsRow;
+  "public.reserved_brand_releases": PublicReservedBrandReleasesRow;
+  "public.reserved_brands": PublicReservedBrandsRow;
   "public.reserved_handles": PublicReservedHandlesRow;
   "public.saved_qrs": PublicSavedQrsRow;
   "public.security_codes": PublicSecurityCodesRow;

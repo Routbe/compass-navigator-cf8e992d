@@ -54,11 +54,13 @@ export const createWorkspace = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     const { sql } = await import("@/lib/neon");
     const { setActiveWorkspaceCookie } = await import("./workspaces.server");
-    const { workspaceSlug } = await import("./workspace-rules");
+    const { matrixWorkspaceSlug, isValidWorkspaceSlug } = await import("./workspace-rules");
     // rout.be/w/<naam>; bij een bezet adres "-2", "-3", … tot het uniek is.
     let slug = "";
+    // Nieuwe workspaces starten op het gratis plan: altijd een willekeurige suffix.
     for (let i = 0; i < 12 && !slug; i++) {
-      const candidate = workspaceSlug(data.name, i);
+      const candidate = matrixWorkspaceSlug(data.name, "free");
+      if (!isValidWorkspaceSlug(candidate)) continue;
       const taken = (await sql`select 1 from public.workspaces where slug = ${candidate} limit 1`) as unknown[];
       if (!taken.length) slug = candidate;
     }

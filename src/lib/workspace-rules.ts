@@ -1,3 +1,4 @@
+import { isReservedName } from "./reserved-brands";
 /** Pure workspace/RBAC rules — shared by server checks and UI, unit-tested. */
 
 export const WORKSPACE_ROLES = ["owner", "admin", "developer", "editor"] as const;
@@ -61,7 +62,8 @@ export function isValidWorkspaceSlug(slug: string): boolean {
     slug.length >= 3 &&
     slug.length <= 40 &&
     WORKSPACE_SLUG_RE.test(slug) &&
-    !(RESERVED_WORKSPACE_SLUGS as readonly string[]).includes(slug)
+    !(RESERVED_WORKSPACE_SLUGS as readonly string[]).includes(slug) &&
+    !isReservedName(slug).reserved
   );
 }
 
@@ -70,4 +72,18 @@ export function workspaceSlug(name: string, attempt = 0): string {
   let base = slugify(name).slice(0, 34).replace(/-+$/, "");
   if (!isValidWorkspaceSlug(base)) base = `${base || "team"}-team`.replace(/^-+/, "");
   return attempt > 0 ? `${base}-${Math.trunc(attempt) + 1}` : base;
+}
+
+/** Namespace matrix: free workspaces always get a random 4-char suffix; paid plans may hold the clean slug. */
+export type WorkspaceSlugPlan = "free" | "plus" | "pro";
+const SUFFIX_ALPHABET = "abcdefghijkmnpqrstuvwxyz23456789";
+
+export function randomSlugSuffix(bytes: Uint8Array = crypto.getRandomValues(new Uint8Array(4))): string {
+  return Array.from(bytes.slice(0, 4), (b) => SUFFIX_ALPHABET[b % SUFFIX_ALPHABET.length]).join("");
+}
+
+export function matrixWorkspaceSlug(name: string, plan: WorkspaceSlugPlan, suffix: string = randomSlugSuffix()): string {
+  let base = slugify(name).slice(0, 34).replace(/-+$/, "");
+  if (base.length < 3 || isReservedName(base).reserved) base = `${base || "team"}-team`.replace(/^-+/, "");
+  return plan === "free" ? `${base}-${suffix}` : base;
 }

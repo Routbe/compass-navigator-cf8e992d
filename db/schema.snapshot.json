@@ -11073,6 +11073,177 @@
     },
     {
       "schema": "public",
+      "name": "reserved_brand_releases",
+      "columns": [
+        {
+          "name": "term",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "released_by",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "evidence",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "reserved_brand_releases_evidence_check",
+          "kind": "c",
+          "def": "CHECK (((length(evidence) >= 3) AND (length(evidence) <= 500)))"
+        },
+        {
+          "name": "reserved_brand_releases_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (term, user_id)"
+        },
+        {
+          "name": "reserved_brand_releases_released_by_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (released_by) REFERENCES users(id)"
+        },
+        {
+          "name": "reserved_brand_releases_term_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (term) REFERENCES reserved_brands(term) ON DELETE CASCADE"
+        },
+        {
+          "name": "reserved_brand_releases_user_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "reserved_brand_releases_owner",
+          "permissive": true,
+          "roles": [
+            "rout_app"
+          ],
+          "cmd": "SELECT",
+          "using": "((user_id)::text = current_setting('rout.user_id'::text, true))",
+          "check": null
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "INSERT",
+          "SELECT"
+        ]
+      }
+    },
+    {
+      "schema": "public",
+      "name": "reserved_brands",
+      "columns": [
+        {
+          "name": "term",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "category",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "reserved_brands_category_check",
+          "kind": "c",
+          "def": "CHECK ((category = ANY (ARRAY['platform'::text, 'brand'::text, 'public_body'::text, 'impersonation'::text])))"
+        },
+        {
+          "name": "reserved_brands_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (term)"
+        },
+        {
+          "name": "reserved_brands_term_check",
+          "kind": "c",
+          "def": "CHECK ((term ~ '^[a-z0-9]+$'::text))"
+        }
+      ],
+      "indexes": [],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "reserved_brands_read",
+          "permissive": true,
+          "roles": [
+            "rout_app"
+          ],
+          "cmd": "SELECT",
+          "using": "true",
+          "check": null
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "SELECT"
+        ]
+      }
+    },
+    {
+      "schema": "public",
       "name": "reserved_handles",
       "columns": [
         {

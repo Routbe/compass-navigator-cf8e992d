@@ -1216,6 +1216,21 @@ export interface PublicReferralsRow {
   "verified_at": string | Date | null;
 }
 
+export interface PublicReservedBrandReleasesRow {
+  "term": string;
+  "user_id": string;
+  "released_by": string;
+  "evidence": string;
+  "created_at": string | Date;
+}
+
+export interface PublicReservedBrandsRow {
+  "term": string;
+  "category": string;
+  "reason": string;
+  "created_at": string | Date;
+}
+
 export interface PublicReservedHandlesRow {
   "handle": string;
   "reason": string;
@@ -1848,6 +1863,8 @@ export interface DbTables {
   "public.qr_scans": PublicQrScansRow;
   "public.rate_limits": PublicRateLimitsRow;
   "public.referrals": PublicReferralsRow;
+  "public.reserved_brand_releases": PublicReservedBrandReleasesRow;
+  "public.reserved_brands": PublicReservedBrandsRow;
   "public.reserved_handles": PublicReservedHandlesRow;
   "public.saved_qrs": PublicSavedQrsRow;
   "public.security_codes": PublicSecurityCodesRow;

@@ -3458,7 +3458,7 @@
         {
           "name": "booking_event_types_duration_minutes_check",
           "kind": "c",
-          "def": "CHECK ((((duration_minutes >= 5) AND (duration_minutes <= 480)) AND ((duration_minutes % 5) = 0)))"
+          "def": "CHECK (((duration_minutes >= 5) AND (duration_minutes <= 480) AND ((duration_minutes % 5) = 0)))"
         },
         {
           "name": "booking_event_types_location_kind_check",
@@ -6141,6 +6141,345 @@
     },
     {
       "schema": "public",
+      "name": "identity_link_events",
+      "columns": [
+        {
+          "name": "id",
+          "type": "bigint",
+          "notNull": true,
+          "default": null,
+          "identity": "a",
+          "generated": null
+        },
+        {
+          "name": "link_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "event",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "ip_hash",
+          "type": "bytea",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "ua_hash",
+          "type": "bytea",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "prev_hash",
+          "type": "bytea",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "event_hash",
+          "type": "bytea",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "identity_link_events_event_check",
+          "kind": "c",
+          "def": "CHECK ((event = ANY (ARRAY['linked'::text, 'reverified'::text, 'login_enabled'::text, 'login_disabled'::text, 'revoked'::text, 'disputed'::text])))"
+        },
+        {
+          "name": "identity_link_events_event_hash_check",
+          "kind": "c",
+          "def": "CHECK ((octet_length(event_hash) = 32))"
+        },
+        {
+          "name": "identity_link_events_link_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (link_id) REFERENCES identity_links(id) ON DELETE CASCADE"
+        },
+        {
+          "name": "identity_link_events_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX identity_link_events_chain_idx ON public.identity_link_events USING btree (link_id, id DESC)"
+      ],
+      "triggers": [
+        "CREATE TRIGGER identity_events_append_only BEFORE INSERT OR DELETE OR UPDATE ON public.identity_link_events FOR EACH ROW EXECUTE FUNCTION identity_event_chain()"
+      ],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "identity_link_events_owner",
+          "permissive": true,
+          "roles": [
+            "rout_app"
+          ],
+          "cmd": "ALL",
+          "using": "((user_id)::text = current_setting('rout.auth_user_id'::text, true))",
+          "check": "((user_id)::text = current_setting('rout.auth_user_id'::text, true))"
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "INSERT",
+          "SELECT"
+        ]
+      }
+    },
+    {
+      "schema": "public",
+      "name": "identity_links",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "notNull": true,
+          "default": "gen_random_uuid()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "provider",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "issuer",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "provider_sub",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "display_handle",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "proof_method",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "proof_digest",
+          "type": "bytea",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "step_up_method",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "step_up_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "notNull": true,
+          "default": "'verified'::text",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "login_enabled",
+          "type": "boolean",
+          "notNull": true,
+          "default": "false",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "last_verified_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "identity_links_issuer_check",
+          "kind": "c",
+          "def": "CHECK (((issuer = lower(issuer)) AND (issuer !~ '/$'::text)))"
+        },
+        {
+          "name": "identity_links_login_verified",
+          "kind": "c",
+          "def": "CHECK (((NOT login_enabled) OR (status = 'verified'::text)))"
+        },
+        {
+          "name": "identity_links_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "identity_links_proof_digest_check",
+          "kind": "c",
+          "def": "CHECK ((octet_length(proof_digest) = 32))"
+        },
+        {
+          "name": "identity_links_proof_method_check",
+          "kind": "c",
+          "def": "CHECK ((proof_method = ANY (ARRAY['oidc_id_token'::text, 'oauth_userinfo'::text, 'atproto_oauth'::text, 'dns_txt'::text, 'rel_me'::text])))"
+        },
+        {
+          "name": "identity_links_provider_sub_check",
+          "kind": "c",
+          "def": "CHECK ((length(provider_sub) > 0))"
+        },
+        {
+          "name": "identity_links_status_check",
+          "kind": "c",
+          "def": "CHECK ((status = ANY (ARRAY['verified'::text, 'revoked'::text, 'disputed'::text])))"
+        },
+        {
+          "name": "identity_links_step_up_method_check",
+          "kind": "c",
+          "def": "CHECK ((step_up_method = ANY (ARRAY['passkey'::text, 'totp'::text, 'email_code'::text, 'signup'::text])))"
+        },
+        {
+          "name": "identity_links_subject_unique",
+          "kind": "u",
+          "def": "UNIQUE (issuer, provider_sub)"
+        },
+        {
+          "name": "identity_links_user_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (user_id) REFERENCES neon_auth.\"user\"(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX identity_links_user_idx ON public.identity_links USING btree (user_id)"
+      ],
+      "triggers": [
+        "CREATE TRIGGER identity_links_owner_immutable BEFORE UPDATE ON public.identity_links FOR EACH ROW EXECUTE FUNCTION identity_owner_immutable()"
+      ],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "identity_links_owner",
+          "permissive": true,
+          "roles": [
+            "rout_app"
+          ],
+          "cmd": "ALL",
+          "using": "((user_id)::text = current_setting('rout.auth_user_id'::text, true))",
+          "check": "((user_id)::text = current_setting('rout.auth_user_id'::text, true))"
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "INSERT",
+          "SELECT",
+          "UPDATE"
+        ]
+      }
+    },
+    {
+      "schema": "public",
       "name": "identity_verification_sessions",
       "columns": [
         {
@@ -7090,6 +7429,127 @@
     },
     {
       "schema": "public",
+      "name": "oauth_access_tokens",
+      "columns": [
+        {
+          "name": "token_hash",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "scopes",
+          "type": "text[]",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "family_id",
+          "type": "uuid",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "oauth_access_tokens_client_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (client_id) REFERENCES oauth_clients(client_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "oauth_access_tokens_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (token_hash)"
+        },
+        {
+          "name": "oauth_access_tokens_user_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX oauth_access_family_idx ON public.oauth_access_tokens USING btree (family_id)",
+        "CREATE INDEX oauth_access_owner_idx ON public.oauth_access_tokens USING btree (user_id, client_id)"
+      ],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "oauth_access_owner",
+          "permissive": true,
+          "roles": [
+            "rout_app"
+          ],
+          "cmd": "ALL",
+          "using": "((user_id)::text = current_setting('rout.user_id'::text, true))",
+          "check": "((user_id)::text = current_setting('rout.user_id'::text, true))"
+        }
+      ],
+      "grants": {
+        "rout_app": [
+          "INSERT",
+          "SELECT",
+          "UPDATE"
+        ]
+      }
+    },
+    {
+      "schema": "public",
       "name": "oauth_auth_codes",
       "columns": [
         {
@@ -7185,6 +7645,14 @@
           "type": "boolean",
           "notNull": true,
           "default": "false",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "auth_time",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
           "identity": null,
           "generated": null
         }
@@ -7592,6 +8060,30 @@
           "default": null,
           "identity": null,
           "generated": null
+        },
+        {
+          "name": "subject_type",
+          "type": "text",
+          "notNull": true,
+          "default": "'pairwise'::text",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "sector_id",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "post_logout_redirect_uris",
+          "type": "text[]",
+          "notNull": true,
+          "default": "'{}'::text[]",
+          "identity": null,
+          "generated": null
         }
       ],
       "constraints": [
@@ -7604,6 +8096,11 @@
           "name": "oauth_clients_pkey",
           "kind": "p",
           "def": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "oauth_clients_subject_type_check",
+          "kind": "c",
+          "def": "CHECK ((subject_type = ANY (ARRAY['public'::text, 'pairwise'::text])))"
         },
         {
           "name": "oauth_clients_workspace_id_fkey",
@@ -7658,6 +8155,14 @@
           "type": "timestamp with time zone",
           "notNull": true,
           "default": "now()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
           "identity": null,
           "generated": null
         }
@@ -7761,6 +8266,164 @@
       "grants": {
         "rout_app": [
           "DELETE",
+          "INSERT",
+          "SELECT",
+          "UPDATE"
+        ]
+      }
+    },
+    {
+      "schema": "public",
+      "name": "oauth_refresh_tokens",
+      "columns": [
+        {
+          "name": "id",
+          "type": "uuid",
+          "notNull": true,
+          "default": "gen_random_uuid()",
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "family_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "token_hash",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "client_id",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "user_id",
+          "type": "uuid",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "scopes",
+          "type": "text[]",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "expires_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "used_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "revoked_at",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "subject",
+          "type": "text",
+          "notNull": true,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "auth_time",
+          "type": "timestamp with time zone",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "acr",
+          "type": "text",
+          "notNull": false,
+          "default": null,
+          "identity": null,
+          "generated": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamp with time zone",
+          "notNull": true,
+          "default": "now()",
+          "identity": null,
+          "generated": null
+        }
+      ],
+      "constraints": [
+        {
+          "name": "oauth_refresh_tokens_client_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (client_id) REFERENCES oauth_clients(client_id) ON DELETE CASCADE"
+        },
+        {
+          "name": "oauth_refresh_tokens_pkey",
+          "kind": "p",
+          "def": "PRIMARY KEY (id)"
+        },
+        {
+          "name": "oauth_refresh_tokens_token_hash_key",
+          "kind": "u",
+          "def": "UNIQUE (token_hash)"
+        },
+        {
+          "name": "oauth_refresh_tokens_user_id_fkey",
+          "kind": "f",
+          "def": "FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE"
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX oauth_refresh_family_idx ON public.oauth_refresh_tokens USING btree (family_id)",
+        "CREATE INDEX oauth_refresh_owner_idx ON public.oauth_refresh_tokens USING btree (user_id, client_id)"
+      ],
+      "triggers": [],
+      "rls": true,
+      "forceRls": false,
+      "policies": [
+        {
+          "name": "oauth_refresh_owner",
+          "permissive": true,
+          "roles": [
+            "rout_app"
+          ],
+          "cmd": "ALL",
+          "using": "((user_id)::text = current_setting('rout.user_id'::text, true))",
+          "check": "((user_id)::text = current_setting('rout.user_id'::text, true))"
+        }
+      ],
+      "grants": {
+        "rout_app": [
           "INSERT",
           "SELECT",
           "UPDATE"
@@ -15159,7 +15822,7 @@
         {
           "name": "workspaces_slug_check",
           "kind": "c",
-          "def": "CHECK ((((char_length(slug) >= 3) AND (char_length(slug) <= 40)) AND (slug ~ '^[a-z0-9-]+$'::text) AND (slug <> ALL (ARRAY['admin'::text, 'api'::text, 'auth'::text, 'u'::text, 'w'::text, 'studio'::text, 'settings'::text, 'rout'::text])))) NOT VALID"
+          "def": "CHECK (((char_length(slug) >= 3) AND (char_length(slug) <= 40) AND (slug ~ '^[a-z0-9-]+$'::text) AND (slug <> ALL (ARRAY['admin'::text, 'api'::text, 'auth'::text, 'u'::text, 'w'::text, 'studio'::text, 'settings'::text, 'rout'::text])))) NOT VALID"
         },
         {
           "name": "workspaces_slug_key",
@@ -15468,6 +16131,18 @@
     },
     {
       "schema": "public",
+      "name": "identity_event_chain",
+      "args": "",
+      "def": "CREATE OR REPLACE FUNCTION public.identity_event_chain()\n RETURNS trigger\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\ndeclare owner_id uuid;\nbegin\n  if TG_OP <> 'INSERT' then raise exception 'identity_events_append_only'; end if;\n  -- Serialize the chain on the identity row, including the first event.\n  select user_id into owner_id from public.identity_links where id = NEW.link_id for update;\n  if owner_id is null or owner_id <> NEW.user_id then raise exception 'identity_event_owner_mismatch'; end if;\n  select event_hash into NEW.prev_hash from public.identity_link_events where link_id = NEW.link_id order by id desc limit 1;\n  NEW.event_hash := public.digest(coalesce(NEW.prev_hash, ''::bytea) || convert_to(\n    jsonb_build_object('link_id',NEW.link_id,'user_id',NEW.user_id,'event',NEW.event,'actor',NEW.actor,\n      'ip_hash',encode(NEW.ip_hash,'hex'),'ua_hash',encode(NEW.ua_hash,'hex'),\n      'created_at',to_char(NEW.created_at at time zone 'UTC','YYYY-MM-DD\"T\"HH24:MI:SS.US\"Z\"'))::text,'UTF8'),'sha256');\n  return NEW;\nend $function$"
+    },
+    {
+      "schema": "public",
+      "name": "identity_owner_immutable",
+      "args": "",
+      "def": "CREATE OR REPLACE FUNCTION public.identity_owner_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nbegin\n  if NEW.user_id <> OLD.user_id or NEW.issuer <> OLD.issuer or NEW.provider_sub <> OLD.provider_sub then\n    raise exception 'identity_owner_immutable';\n  end if;\n  return NEW;\nend $function$"
+    },
+    {
+      "schema": "public",
       "name": "identity_verifications_immutable",
       "args": "",
       "def": "CREATE OR REPLACE FUNCTION public.identity_verifications_immutable()\n RETURNS trigger\n LANGUAGE plpgsql\nAS $function$\nbegin\n  if old.is_verified and current_user = 'rout_app' and (\n       new.is_verified is distinct from old.is_verified\n    or new.verified_real_name is distinct from old.verified_real_name\n    or new.unique_human_id is distinct from old.unique_human_id\n    or new.verification_provider is distinct from old.verification_provider) then\n    raise exception 'identity_immutable' using errcode = '42501';\n  end if;\n  return new;\nend $function$"
@@ -15507,6 +16182,12 @@
       "name": "resolve_short_link",
       "args": "_slug text",
       "def": "CREATE OR REPLACE FUNCTION public.resolve_short_link(_slug text)\n RETURNS TABLE(id uuid, status text, target_url text)\n LANGUAGE sql\n STABLE SECURITY DEFINER\n SET search_path TO 'public'\nAS $function$\n  select q.id,\n    case\n      when not q.is_active then 'disabled'\n      when q.expires_at is not null and q.expires_at < now() then 'expired'\n      else 'ok'\n    end as status,\n    q.target_url\n  from public.tracked_qrs q\n  where q.slug = lower(_slug)\n  limit 1;\n$function$"
+    },
+    {
+      "schema": "public",
+      "name": "rotate_oauth_refresh",
+      "args": "old_hash text, target_client text, new_hash text",
+      "def": "CREATE OR REPLACE FUNCTION public.rotate_oauth_refresh(old_hash text, target_client text, new_hash text)\n RETURNS TABLE(result text, user_id uuid, subject text, scopes text[], family_id uuid, auth_time timestamp with time zone, acr text)\n LANGUAGE plpgsql\n SET search_path TO 'pg_catalog', 'public'\nAS $function$\ndeclare old public.oauth_refresh_tokens%rowtype;\nbegin\n  select * into old from public.oauth_refresh_tokens t where t.token_hash=old_hash and t.client_id=target_client for update;\n  if not found then return query select 'invalid'::text,null::uuid,null::text,null::text[],null::uuid,null::timestamptz,null::text; return; end if;\n  -- Family-wide advisory lock prevents a concurrent descendant issuance from escaping revocation.\n  perform pg_advisory_xact_lock(hashtextextended(old.family_id::text,0));\n  if old.used_at is not null then\n    update public.oauth_refresh_tokens t set revoked_at=coalesce(t.revoked_at,now()) where t.family_id=old.family_id;\n    update public.oauth_access_tokens t set revoked_at=coalesce(t.revoked_at,now()) where t.family_id=old.family_id;\n    return query select 'reuse'::text,null::uuid,null::text,null::text[],old.family_id,null::timestamptz,null::text; return;\n  end if;\n  if old.revoked_at is not null or old.expires_at<=now()\n    or exists(select 1 from public.oauth_refresh_tokens t where t.family_id=old.family_id and t.revoked_at is not null)\n    or not exists(select 1 from public.oauth_consents c where c.user_id=old.user_id and c.client_id=target_client and c.revoked_at is null and 'offline_access'=any(c.scopes))\n    or not exists(select 1 from public.users u where u.id=old.user_id and not u.is_disabled and u.account_status='active')\n    or not exists(select 1 from public.oauth_clients c where c.client_id=target_client and c.status='active') then\n    return query select 'invalid'::text,null::uuid,null::text,null::text[],old.family_id,null::timestamptz,null::text; return;\n  end if;\n  update public.oauth_refresh_tokens t set used_at=now() where t.id=old.id;\n  insert into public.oauth_refresh_tokens(family_id,token_hash,client_id,user_id,scopes,expires_at,subject,auth_time,acr)\n  values(old.family_id,new_hash,target_client,old.user_id,old.scopes,old.expires_at,old.subject,old.auth_time,old.acr);\n  return query select 'ok'::text,old.user_id,old.subject,old.scopes,old.family_id,old.auth_time,old.acr;\nend $function$"
     },
     {
       "schema": "public",
